@@ -361,6 +361,12 @@ const AP_Param::Info AP_Periph_FW::var_info[] = {
     // @Path: ../libraries/AP_SerialManager/AP_SerialManager.cpp
     GOBJECT(serial_manager, "SERIAL",   AP_SerialManager),
 #endif
+// @Param: LOG_BITMASK
+// @DisplayName: Log bitmask
+// @Description: 4 byte bitmap of log types to enable
+// @Bitmask: 2:GPS
+// @User: Standard
+GSCALAR(cpn_rst_ct,    "CPN_RST_CT",          0),
 
 #if AP_SCRIPTING_ENABLED
     // @Group: SCR_

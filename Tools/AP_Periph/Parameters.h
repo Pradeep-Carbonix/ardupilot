@@ -51,6 +51,7 @@ public:
         k_param_gps_mb_only_can_port,
         k_param_scripting,
         k_param_esc_telem_port,
+        k_param_cpn_rst_ct,
     };
 
     AP_Int16 format_version;
@@ -118,7 +119,7 @@ public:
 #if HAL_LOGGING_ENABLED
     AP_Int32        log_bitmask;
 #endif
-
+AP_Int32        cpn_rst_ct;
 #if HAL_GCS_ENABLED
     AP_Int16 sysid_this_mav;
 #endif
