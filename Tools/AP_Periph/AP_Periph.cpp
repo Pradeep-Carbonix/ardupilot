@@ -23,6 +23,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AP_Periph.h"
 #include <stdio.h>
+#include <GCS_MAVLink/GCS.h>
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_CHIBIOS
 #include <AP_HAL_ChibiOS/hwdef/common/stm32_util.h>
@@ -43,9 +44,63 @@ void stm32_watchdog_init() {}
 void stm32_watchdog_pat() {}
 #endif
 
+AP_HAL::AnalogSource* srevoV;    //delare a pointer to AnalogSource object. AnalogSource class can be found in : AP_HAL->AnalogIn.h
+AP_HAL::AnalogSource* vsup5v;    //delare a pointer to AnalogSource object. AnalogSource class can be found in : AP_HAL->AnalogIn.h
+AP_HAL::AnalogSource* servoCV;    //delare a pointer to AnalogSource object. AnalogSource class can be found in : AP_HAL->AnalogIn.h
+AP_HAL::AnalogSource* adc3;    //delare a pointer to AnalogSource object. AnalogSource class can be found in : AP_HAL->AnalogIn.h
+AP_HAL::UARTDriver *uart1;
+AP_HAL::UARTDriver *uart2;
+AP_HAL::UARTDriver *uart3;
+AP_HAL::UARTDriver *uart4;
+
+
+float v = 0.0;
+
 void setup(void)
 {
     periph.init();
+    srevoV  = hal.analogin->channel(10);    //initialization of chan variable. AnalogIn class can be found in : AP_HAL->AnalogIn.h
+    vsup5v  = hal.analogin->channel(11);    //initialization of chan variable. AnalogIn class can be found in : AP_HAL->AnalogIn.h
+    servoCV = hal.analogin->channel(16);    //initialization of chan variable. AnalogIn class can be found in : AP_HAL->AnalogIn.h
+    adc3    = hal.analogin->channel(15);    //initialization of chan variable. AnalogIn class can be found in : AP_HAL->AnalogIn.h
+    uart1   = hal.serial(0);
+    uart2   = hal.serial(1);
+    uart3   = hal.serial(2);
+    uart4   = hal.serial(3);
+    uint32_t rst_ct = periph.g.cpn_rst_ct.get();
+    rst_ct++;
+    periph.g.cpn_rst_ct.set_and_save(rst_ct);
+
+    //cpn_rst_ct = 100;
+    GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "System Init");
+    if (uart1 != nullptr) {
+        uart1->begin(115200);
+        uart1->printf("Hello on UART 1");
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 1 Init");
+    }
+    else
+    {GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 1 Fail");}
+    if (uart2 != nullptr) {
+        uart2->begin(115200);
+        uart2->printf("Hello on UART 2");
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 2 Init");
+    }
+    else
+    {GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 2 Fail");}
+    if (uart3 != nullptr) {
+        uart3->begin(115200);
+        uart3->printf("Hello on UART 3");
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 3 Init");
+    }
+    else
+    {GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 4 Fail");}
+    if (uart4 != nullptr) {
+        uart4->begin(115200);
+        uart4->printf("Hello on UART 4");
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 4 Init");
+    }
+    else
+    {GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "UART 4 Fail");}
 }
 
 void loop(void)
@@ -168,7 +223,7 @@ void AP_Periph_FW::init()
 #endif
 
 #ifdef HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY
-    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, HAL_PERIPH_NEOPIXEL_COUNT_WITHOUT_NOTIFY, AP_HAL::RCOutput::MODE_NEOPIXEL);
+    hal.rcout->set_serial_led_num_LEDs(HAL_PERIPH_NEOPIXEL_CHAN_WITHOUT_NOTIFY, AP_HAL::RCOutput::MODE_NEOPIXEL);
 #endif
 
 #ifdef HAL_PERIPH_ENABLE_RC_OUT
@@ -313,12 +368,43 @@ void AP_Periph_FW::show_stack_free()
 
 
 
+
 void AP_Periph_FW::update()
 {
     static uint32_t last_led_ms;
     uint32_t now = AP_HAL::native_millis();
     if (now - last_led_ms > 1000) {
-        last_led_ms = now;
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Loop start");
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM1 - srevoV  %.3f] ", (double)srevoV->voltage_average());   
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM2 - vsup5v  %.3f] ", (double)vsup5v->voltage_average());   
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM3 - adc3    %.3f] ", (double)adc3->voltage_average());   
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM4 - servoCV %.3f] ", (double)servoCV->voltage_average());  
+        uint8_t data = 0;
+        uart1->printf("1.");
+        uart2->printf("2.");
+        uart3->printf("3."); 
+        if(uart1->available())
+        {
+            data = uart1->read();
+            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[UART1 - RX: %d] ",data );  
+        }
+        if(uart2->available())
+        {           
+            data = uart2->read();
+            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[UART2 - RX: %d] ",data );
+        }
+        if(uart3->available())
+        {
+            data = uart3->read();
+            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[UART3 - RX: %d] ",data );  
+        }
+        if(uart4->available())
+        {
+            data = uart4->read();
+            GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[UART4 - RX: %d] ",data );
+        }
+        
+        last_led_ms = now;      
 #ifdef HAL_GPIO_PIN_LED
         if (!no_iface_finished_dna) {
             palToggleLine(HAL_GPIO_PIN_LED);
