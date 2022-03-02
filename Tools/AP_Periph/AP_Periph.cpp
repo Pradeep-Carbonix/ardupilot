@@ -67,6 +67,8 @@ void setup(void)
     uart2   = hal.serial(1);
     uart3   = hal.serial(2);
     uart4   = hal.serial(3);
+
+    // Carbonix : Used for IronBird Testing
     uint32_t rst_ct = periph.g.cpn_rst_ct.get();
     rst_ct++;
     periph.g.cpn_rst_ct.set_and_save(rst_ct);
@@ -374,11 +376,11 @@ void AP_Periph_FW::update()
     static uint32_t last_led_ms;
     uint32_t now = AP_HAL::native_millis();
     if (now - last_led_ms > 1000) {
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Loop start");
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM1 - srevoV  %.3f] ", (double)srevoV->voltage_average());   
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM2 - vsup5v  %.3f] ", (double)vsup5v->voltage_average());   
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM3 - adc3    %.3f] ", (double)adc3->voltage_average());   
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM4 - servoCV %.3f] ", (double)servoCV->voltage_average());  
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "Loop start");
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM1 - srevoV  %.3f] ", (double)srevoV->voltage_average());   
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM2 - vsup5v  %.3f] ", (double)vsup5v->voltage_average());   
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM3 - adc3    %.3f] ", (double)adc3->voltage_average());   
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE, "[PWM4 - servoCV %.3f] ", (double)servoCV->voltage_average());  
         uint8_t data = 0;
         uart1->printf("1.");
         uart2->printf("2.");
